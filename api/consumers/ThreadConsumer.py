@@ -89,5 +89,6 @@ class ThreadConsumer(AsyncWebsocketConsumer):
     def update_user_last_seen(self, username):
         user = User.objects.get(username=username)
         user.last_login = datetime.now()
+        user.remarks = ""
         user.save()
         return user
