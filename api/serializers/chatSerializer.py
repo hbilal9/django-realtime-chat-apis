@@ -12,6 +12,7 @@ class ThreadSerializer(serializers.ModelSerializer):
         return {
             'id': obj.first_person.id,
             'username': obj.first_person.username,
+            'avatar': obj.first_person.avatar.url if obj.first_person.avatar else '',
             'full_name': obj.first_person.fullName()
         } if obj.first_person.id != self.context['request'].user.id else obj.first_person.id
     
@@ -19,6 +20,7 @@ class ThreadSerializer(serializers.ModelSerializer):
         return {
             'id': obj.second_person.id,
             'username': obj.second_person.username,
+            'avatar': obj.second_person.avatar.url if obj.second_person.avatar else '',
             'full_name': obj.second_person.fullName(),
         } if obj.second_person.id != self.context['request'].user.id else obj.second_person.id
 class MessageSerializer(serializers.ModelSerializer):
