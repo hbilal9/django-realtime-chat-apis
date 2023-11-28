@@ -21,7 +21,9 @@ class TestConsumer(AsyncWebsocketConsumer):
         text_data_json = json.loads(text_data)
         print("TicketAssignConsumer: receive", text_data_json)
         await self.send(text_data=json.dumps({
-            'message': 'sended from TicketAssignConsumer'
+            'send_from': text_data_json['data']['send_from'],
+            'send_to': text_data_json['data']['send_to'],
+            'text': text_data_json['data']['text'],
         }))
 
     async def send_message(self, event):

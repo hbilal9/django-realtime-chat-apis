@@ -3,6 +3,8 @@ db.sqlite3
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
+*.pyc
+/__pycache__/
 
 # C extensions
 *.so
