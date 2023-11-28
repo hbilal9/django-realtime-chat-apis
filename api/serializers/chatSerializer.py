@@ -13,7 +13,9 @@ class ThreadSerializer(serializers.ModelSerializer):
             'id': obj.first_person.id,
             'username': obj.first_person.username,
             'avatar': obj.first_person.avatar.url if obj.first_person.avatar else '',
-            'full_name': obj.first_person.fullName()
+            'full_name': obj.first_person.fullName(),
+            'last_seen': obj.first_person.last_login,
+            'active_status': obj.first_person.remarks,
         } if obj.first_person.id != self.context['request'].user.id else obj.first_person.id
     
     def get_second_person(self, obj):
@@ -22,6 +24,8 @@ class ThreadSerializer(serializers.ModelSerializer):
             'username': obj.second_person.username,
             'avatar': obj.second_person.avatar.url if obj.second_person.avatar else '',
             'full_name': obj.second_person.fullName(),
+            'last_seen': obj.first_person.last_login,
+            'active_status': obj.first_person.remarks,
         } if obj.second_person.id != self.context['request'].user.id else obj.second_person.id
 class MessageSerializer(serializers.ModelSerializer):
     class Meta:
