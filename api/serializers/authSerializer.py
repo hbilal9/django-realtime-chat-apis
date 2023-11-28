@@ -57,6 +57,17 @@ class RegisterSerializer(serializers.Serializer):
         if password != self.initial_data['confirm_password']:
             raise serializers.ValidationError("Confirm password must match.")
         return password
+    
+    def create(self, validated_data):
+        user = User.objects.create_user(
+            username=validated_data['username'],
+            email=validated_data['email'],
+            first_name=validated_data['first_name'],
+            last_name=validated_data['last_name'],
+        )
+        user.set_password(validated_data['password'])
+        user.save()
+        return user
 
 class UserSerializer(serializers.ModelSerializer):
     account_type = serializers.CharField(read_only=True)
