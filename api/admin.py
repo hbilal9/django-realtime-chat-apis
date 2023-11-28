@@ -1,7 +1,11 @@
 from django.contrib import admin
-from .models import Thread, Message
+from .models import Thread, Message, User
 
 # Register your models here.
+
+class AdminUser(admin.ModelAdmin):
+    list_display = ('first_name', 'last_name', 'username', 'email', 'is_staff', 'is_active', 'is_superuser')
+    search_fields = ('username', 'email')
 
 class ThreadAdmin(admin.ModelAdmin):
     list_display = ('first_person', 'second_person', 'created_at', 'updated_at')
@@ -13,3 +17,4 @@ class MessageAdmin(admin.ModelAdmin):
 
 admin.site.register(Thread, ThreadAdmin)
 admin.site.register(Message, MessageAdmin)
+admin.site.register(User, AdminUser)
