@@ -3,6 +3,7 @@ from api.serializers.chatSerializer import MessageSerializer
 from api.models import Thread, Message, User
 from channels.db import database_sync_to_async
 import json
+from datetime import datetime
 
 class ThreadConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -20,8 +21,9 @@ class ThreadConsumer(AsyncWebsocketConsumer):
             self.room_group_name,
             self.channel_name
         )
-        user = await self.get_user_object(self.username)
-        print("Thread: disconnect", user.first_name, user.last_name)
+        # user = await self.get_user_object(self.username)
+        # print("Thread: disconnect", user.first_name, user.last_name)
+        await self.update_user_last_seen(self.username)
 
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
@@ -82,3 +84,10 @@ class ThreadConsumer(AsyncWebsocketConsumer):
     @database_sync_to_async
     def get_thread_object(self, id):
         return Thread.objects.get(pk=id) or None
+    
+    @database_sync_to_async
+    def update_user_last_seen(self, username):
+        user = User.objects.get(username=username)
+        user.last_login = datetime.now()
+        user.save()
+        return user
