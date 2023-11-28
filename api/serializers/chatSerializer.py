@@ -12,16 +12,14 @@ class ThreadSerializer(serializers.ModelSerializer):
         return {
             'id': obj.first_person.id,
             'username': obj.first_person.username,
-            'first_name': obj.first_person.first_name,
-            'last_name': obj.first_person.last_name,
+            'full_name': obj.first_person.fullName()
         } if obj.first_person.id != self.context['request'].user.id else obj.first_person.id
     
     def get_second_person(self, obj):
         return {
             'id': obj.second_person.id,
             'username': obj.second_person.username,
-            'first_name': obj.second_person.first_name,
-            'last_name': obj.second_person.last_name,
+            'full_name': obj.second_person.fullName(),
         } if obj.second_person.id != self.context['request'].user.id else obj.second_person.id
 class MessageSerializer(serializers.ModelSerializer):
     thread = ThreadSerializer(read_only=True)
