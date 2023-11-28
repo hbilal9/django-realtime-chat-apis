@@ -5,12 +5,13 @@ class TestConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.username = self.scope["url_route"]["kwargs"]["username"]
         self.room_group_name = f"ticket_assign_{self.username}"
+        user = self.scope['user']
         await self.channel_layer.group_add(
             self.room_group_name,
             self.channel_name
         )
         await self.accept()
-        print(self.scope['user'])
+        print(user.username, "connected")
 
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard(
@@ -23,7 +24,7 @@ class TestConsumer(AsyncWebsocketConsumer):
         print("TicketAssignConsumer: receive", text_data_json)
         await self.send(text_data=json.dumps({
             'send_from': text_data_json['data']['send_from'],
-            'send_to': text_data_json['data']['send_to'],
+            'thread_id': text_data_json['data']['thread_id'],
             'text': text_data_json['data']['text'],
         }))
 
