@@ -20,6 +20,8 @@ class ThreadConsumer(AsyncWebsocketConsumer):
             self.room_group_name,
             self.channel_name
         )
+        user = await self.get_user_object(self.username)
+        print("Thread: disconnect", user.first_name, user.last_name)
 
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
@@ -41,7 +43,7 @@ class ThreadConsumer(AsyncWebsocketConsumer):
         thread = await self.get_thread_object(text_data_json['data']['thread_id'])
         reciever_user_id = thread.first_person_id if thread.first_person_id != text_data_json['data']['send_from'] else thread.second_person_id
 
-        receiver_user = await self.get_user_object(reciever_user_id)
+        receiver_user = await self.get_user_object(int(reciever_user_id))
         receiver_room_group_name = f"thread_{receiver_user.username}"
         await self.channel_layer.group_send(
             receiver_room_group_name,
@@ -72,7 +74,10 @@ class ThreadConsumer(AsyncWebsocketConsumer):
     
     @database_sync_to_async
     def get_user_object(self, id):
-        return User.objects.get(pk=id) or None
+        if type(id) == str:
+            return User.objects.get(username=id) or None
+        else:
+            return User.objects.get(pk=id) or None
     
     @database_sync_to_async
     def get_thread_object(self, id):
