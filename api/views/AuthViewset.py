@@ -6,7 +6,7 @@ from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
-from api.serializers.authSerializer import LoginSerializer, UserSerializer
+from api.serializers.authSerializer import LoginSerializer, UserSerializer, RegisterSerializer
 
 class LoginView(APIView):
     def post(self, request):
@@ -41,3 +41,21 @@ class LoginView(APIView):
             }, 200)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
+class RegisterView(viewsets.generics.CreateAPIView):
+    def post(self, request):
+        serializer = RegisterSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(
+                {
+                    'message': 'Invalid data',
+                    'errors': serializer.errors,
+                },
+                status=status.HTTP_422_UNPROCESSABLE_ENTITY
+            )
+        serializer.save()
+
+        return Response({
+            'message': 'Account created successfully',
+            'success': True,
+        })
