@@ -15,6 +15,7 @@ class ThreadConsumer(AsyncWebsocketConsumer):
             self.channel_name
         )
         await self.accept()
+        await self.update_user_remarks(self.username, "online")
 
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard(
@@ -90,5 +91,12 @@ class ThreadConsumer(AsyncWebsocketConsumer):
         user = User.objects.get(username=username)
         user.last_login = datetime.now()
         user.remarks = ""
+        user.save()
+        return user
+    
+    @database_sync_to_async
+    def update_user_remarks(self, username, remarks):
+        user = User.objects.get(username=username)
+        user.remarks = remarks
         user.save()
         return user
