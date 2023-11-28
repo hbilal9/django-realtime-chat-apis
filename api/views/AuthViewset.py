@@ -59,3 +59,15 @@ class RegisterView(viewsets.generics.CreateAPIView):
             'message': 'Account created successfully',
             'success': True,
         })
+    
+class ProfileView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request):
+        try:
+            user = request.user
+            serializer = UserSerializer(user)
+            return Response(serializer.data, 200)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
