@@ -4,9 +4,11 @@ from rest_framework_simplejwt.views import TokenRefreshView
 
 from api.views.TestViewset import TestViewset
 from api.views.AuthViewset import LoginView, RegisterView, ProfileView
+from api.views.ChatViewset import ChatViewSet
 
 router = SimpleRouter()
 router.register('test', TestViewset, basename='test')
+router.register('chats', ChatViewSet, basename='chats')
 
 urlpatterns = [
     path('', include(router.urls)),
