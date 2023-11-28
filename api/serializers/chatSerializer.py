@@ -24,7 +24,6 @@ class ThreadSerializer(serializers.ModelSerializer):
             'full_name': obj.second_person.fullName(),
         } if obj.second_person.id != self.context['request'].user.id else obj.second_person.id
 class MessageSerializer(serializers.ModelSerializer):
-    thread = ThreadSerializer(read_only=True)
     class Meta:
         model = Message
         fields = ('id', 'thread', 'sender', 'text', 'created_at', 'updated_at')
