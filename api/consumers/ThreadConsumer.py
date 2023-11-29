@@ -1,5 +1,5 @@
 from channels.generic.websocket import AsyncWebsocketConsumer
-from api.serializers.chatSerializer import MessageSerializer
+from api.serializers.chatSerializer import MessageSerializer, ThreadSerializer
 from api.models import Thread, Message, User
 from channels.db import database_sync_to_async
 import json
@@ -16,6 +16,7 @@ class ThreadConsumer(AsyncWebsocketConsumer):
         )
         await self.accept()
         await self.update_user_remarks(self.username, "online")
+
 
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard(
@@ -100,3 +101,9 @@ class ThreadConsumer(AsyncWebsocketConsumer):
         user.remarks = remarks
         user.save()
         return user
+    
+    @database_sync_to_async
+    def get_user_threads(self, username):
+        user = User.objects.get(username=username)
+        threads = Thread.objects.filter(first_person=user) | Thread.objects.filter(second_person=user)
+        return threads
