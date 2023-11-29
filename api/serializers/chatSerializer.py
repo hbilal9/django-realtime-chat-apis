@@ -25,7 +25,7 @@ class ThreadSerializer(serializers.ModelSerializer):
             'avatar': obj.second_person.avatar.url if obj.second_person.avatar else '',
             'full_name': obj.second_person.fullName(),
             'last_seen': obj.first_person.last_login,
-            'active_status': obj.first_person.remarks,
+            'active_status': obj.second_person.remarks,
         } if obj.second_person.id != self.context['request'].user.id else obj.second_person.id
 class MessageSerializer(serializers.ModelSerializer):
     class Meta:
