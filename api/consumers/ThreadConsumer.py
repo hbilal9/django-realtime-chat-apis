@@ -67,6 +67,14 @@ class ThreadConsumer(AsyncWebsocketConsumer):
             'text': event['text'],
         }))
 
+    async def send_online_status(self, event):
+        print("thread: send_online_status", event)
+        # await self.send(text_data=json.dumps({
+        #     'send_from': event['sender_id'],
+        #     'thread_id': event['thread_id'],
+        #     'text': event['text'],
+        # }))
+
     @database_sync_to_async
     def create_message(self, data):
         message = Message.objects.create(
