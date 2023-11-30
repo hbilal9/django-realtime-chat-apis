@@ -11,52 +11,54 @@ class ThreadConsumer(AsyncWebsocketConsumer):
         self.username = self.scope["url_route"]["kwargs"]["username"]
         self.room_group_name = f"thread_{self.username}"
         user = self.scope['user']
+        print(datetime.now())
         await self.channel_layer.group_add(
             self.room_group_name,
             self.channel_name
         )
         await self.accept()
         await self.update_user_remarks(self.username, "online")
-        threads = await self.get_user_threads(self.username)
-        for thread in threads:
-            if thread['first_person']['username'] == self.username:
-                await self.channel_layer.group_send(
-                    f"thread_{thread['second_person']['username']}",
-                    {
-                        'type': 'send_online_status',
-                        'thread_id': thread['id'],
-                        'first_person': {
-                            'id': thread['first_person']['id'],
-                            'username': thread['first_person']['username'],
-                            'avatar': thread['first_person']['avatar'],
-                            'full_name': thread['first_person']['full_name'],
-                            # 'last_seen': last_seen_str,
-                            'active_status': thread['first_person']['active_status'],
-                        },
-                        'second_person': thread['second_person']['id'],
-                        # 'created_at': thread['created_at'],
-                        # 'updated_at': thread['updated_at'],
-                    }
-                )
-            else:
-                await self.channel_layer.group_send(
-                    f"thread_{thread['first_person']['username']}",
-                    {
-                        'type': 'send_online_status',
-                        'id': thread['id'],
-                        'first_person': thread['second_person']['id'],
-                        'second_person': {
-                            'id': thread['second_person']['id'],
-                            'username': thread['second_person']['username'],
-                            'avatar': thread['second_person']['avatar'],
-                            'full_name': thread['second_person']['full_name'],
-                            # 'last_seen': thread['second_person']['last_seen'],
-                            'active_status': thread['second_person']['active_status'],
-                        },
-                        # 'created_at': thread['created_at'],
-                        # 'updated_at': thread['updated_at'],
-                    }
-                )
+        await self.user_status(self.username)
+        # threads = await self.get_user_threads(self.username)
+        # for thread in threads:
+        #     if thread['first_person']['username'] == self.username:
+        #         await self.channel_layer.group_send(
+        #             f"thread_{thread['second_person']['username']}",
+        #             {
+        #                 'type': 'send_online_status',
+        #                 'thread_id': thread['id'],
+        #                 'first_person': {
+        #                     'id': thread['first_person']['id'],
+        #                     'username': thread['first_person']['username'],
+        #                     'avatar': thread['first_person']['avatar'],
+        #                     'full_name': thread['first_person']['full_name'],
+        #                     # 'last_seen': last_seen_str,
+        #                     'active_status': thread['first_person']['active_status'],
+        #                 },
+        #                 'second_person': thread['second_person']['id'],
+        #                 # 'created_at': thread['created_at'],
+        #                 # 'updated_at': thread['updated_at'],
+        #             }
+        #         )
+        #     else:
+        #         await self.channel_layer.group_send(
+        #             f"thread_{thread['first_person']['username']}",
+        #             {
+        #                 'type': 'send_online_status',
+        #                 'id': thread['id'],
+        #                 'first_person': thread['second_person']['id'],
+        #                 'second_person': {
+        #                     'id': thread['second_person']['id'],
+        #                     'username': thread['second_person']['username'],
+        #                     'avatar': thread['second_person']['avatar'],
+        #                     'full_name': thread['second_person']['full_name'],
+        #                     # 'last_seen': thread['second_person']['last_seen'],
+        #                     'active_status': thread['second_person']['active_status'],
+        #                 },
+        #                 # 'created_at': thread['created_at'],
+        #                 # 'updated_at': thread['updated_at'],
+        #             }
+        #         )
 
 
     async def disconnect(self, close_code):
@@ -66,7 +68,8 @@ class ThreadConsumer(AsyncWebsocketConsumer):
         )
         # user = await self.get_user_object(self.username)
         # print("Thread: disconnect", user.first_name, user.last_name)
-        await self.update_user_last_seen(self.username)
+        user = await self.update_user_last_seen(self.username)
+        await self.user_status(self.username)
 
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
@@ -118,6 +121,48 @@ class ThreadConsumer(AsyncWebsocketConsumer):
     async def send_online_status(self, event):
         print("thread: send_online_status", event)
         await self.send(text_data=json.dumps(event))
+
+    async def user_status(self, username):
+        threads = await self.get_user_threads(username)
+        for thread in threads:
+            if thread['first_person']['username'] == username:
+                await self.channel_layer.group_send(
+                    f"thread_{thread['second_person']['username']}",
+                    {
+                        'type': 'send_online_status',
+                        'thread_id': thread['id'],
+                        'first_person': {
+                            'id': thread['first_person']['id'],
+                            'username': thread['first_person']['username'],
+                            'avatar': thread['first_person']['avatar'],
+                            'full_name': thread['first_person']['full_name'],
+                            'last_seen': thread['second_person']['last_seen'].strftime('%Y-%m-%d %H:%M:%S'),
+                            'active_status': thread['first_person']['active_status'],
+                        },
+                        'second_person': thread['second_person']['id'],
+                        # 'created_at': thread['created_at'].strftime('%Y-%m-%d %H:%M:%S'),
+                        # 'updated_at': thread['updated_at'].strftime('%Y-%m-%d %H:%M:%S'),
+                    }
+                )
+            else:
+                await self.channel_layer.group_send(
+                    f"thread_{thread['first_person']['username']}",
+                    {
+                        'type': 'send_online_status',
+                        'id': thread['id'],
+                        'first_person': thread['second_person']['id'],
+                        'second_person': {
+                            'id': thread['second_person']['id'],
+                            'username': thread['second_person']['username'],
+                            'avatar': thread['second_person']['avatar'],
+                            'full_name': thread['second_person']['full_name'],
+                            'last_seen': thread['second_person']['last_seen'].strftime('%Y-%m-%d %H:%M:%S'),
+                            'active_status': thread['second_person']['active_status'],
+                        },
+                        # 'created_at': thread['created_at'].strftime('%Y-%m-%d %H:%M:%S'),
+                        # 'updated_at': thread['updated_at'].strftime('%Y-%m-%d %H:%M:%S'),
+                    }
+                )
 
     @database_sync_to_async
     def create_message(self, data):
