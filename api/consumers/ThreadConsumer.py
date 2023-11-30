@@ -19,47 +19,6 @@ class ThreadConsumer(AsyncWebsocketConsumer):
         await self.accept()
         await self.update_user_remarks(self.username, "online")
         await self.user_status(self.username)
-        # threads = await self.get_user_threads(self.username)
-        # for thread in threads:
-        #     if thread['first_person']['username'] == self.username:
-        #         await self.channel_layer.group_send(
-        #             f"thread_{thread['second_person']['username']}",
-        #             {
-        #                 'type': 'send_online_status',
-        #                 'thread_id': thread['id'],
-        #                 'first_person': {
-        #                     'id': thread['first_person']['id'],
-        #                     'username': thread['first_person']['username'],
-        #                     'avatar': thread['first_person']['avatar'],
-        #                     'full_name': thread['first_person']['full_name'],
-        #                     # 'last_seen': last_seen_str,
-        #                     'active_status': thread['first_person']['active_status'],
-        #                 },
-        #                 'second_person': thread['second_person']['id'],
-        #                 # 'created_at': thread['created_at'],
-        #                 # 'updated_at': thread['updated_at'],
-        #             }
-        #         )
-        #     else:
-        #         await self.channel_layer.group_send(
-        #             f"thread_{thread['first_person']['username']}",
-        #             {
-        #                 'type': 'send_online_status',
-        #                 'id': thread['id'],
-        #                 'first_person': thread['second_person']['id'],
-        #                 'second_person': {
-        #                     'id': thread['second_person']['id'],
-        #                     'username': thread['second_person']['username'],
-        #                     'avatar': thread['second_person']['avatar'],
-        #                     'full_name': thread['second_person']['full_name'],
-        #                     # 'last_seen': thread['second_person']['last_seen'],
-        #                     'active_status': thread['second_person']['active_status'],
-        #                 },
-        #                 # 'created_at': thread['created_at'],
-        #                 # 'updated_at': thread['updated_at'],
-        #             }
-        #         )
-
 
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard(
