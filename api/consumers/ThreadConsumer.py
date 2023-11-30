@@ -34,7 +34,7 @@ class ThreadConsumer(AsyncWebsocketConsumer):
         text_data_json = json.loads(text_data)
         # print("Thread: receive", text_data_json)
 
-        # await self.create_message(text_data_json['data'])
+        await self.create_message(text_data_json['data'])
         # serializer = MessageSerializer(message)
         await self.channel_layer.group_send(
             self.room_group_name,
