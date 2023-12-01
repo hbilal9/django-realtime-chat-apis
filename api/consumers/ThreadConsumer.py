@@ -72,7 +72,7 @@ class ThreadConsumer(AsyncWebsocketConsumer):
         print("thread: send_message", event)
         await self.send(text_data=json.dumps({
             'type': 'new_message',
-            'send_from': event['sender_id'],
+            'sender': event['sender_id'],
             'thread_id': event['thread_id'],
             'text': event['text'],
         }))
